@@ -8,32 +8,32 @@ import ru.gb.base.BaseScreen;
 
 public class MenuScreen extends BaseScreen {
 
+    private static final float V_LEN = 0.5f;
+
     private Texture img;
-    private Vector2 position;
-    private Vector2 newPosition;
-    private float speed;
-    private Vector2 direction;
-    private Vector2 velocity;
+    private Vector2 touch;
+    private Vector2 pos;
+    private Vector2 v;
 
     @Override
     public void show() {
         super.show();
         img = new Texture("badlogic.jpg");
-        position = new Vector2();
-        newPosition = new Vector2();
-        speed = 1.0f;
-        direction = new Vector2();
-        velocity = new Vector2();
+        touch = new Vector2();
+        pos = new Vector2();
+        v = new Vector2();
     }
 
     @Override
     public void render(float delta) {
         super.render(delta);
         batch.begin();
-        batch.draw(img, position.x, position.y);
+        batch.draw(img, pos.x, pos.y);
         batch.end();
-        if ((int) position.x != newPosition.x && (int) position.y != newPosition.y) {
-            position.add(velocity);
+        if (touch.dst(pos) > V_LEN) {
+            pos.add(v);
+        } else {
+            pos.set(touch);
         }
     }
 
@@ -45,15 +45,14 @@ public class MenuScreen extends BaseScreen {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        newPosition.set(screenX, Gdx.graphics.getHeight() - screenY);
-        direction.set(newPosition).sub(position).nor();
-        velocity = direction.cpy().scl(speed);
-        return super.touchDown(screenX, screenY, pointer, button);
+        touch.set(screenX, Gdx.graphics.getHeight() - screenY);
+        v.set(touch.cpy().sub(pos)).setLength(V_LEN);
+        return false;
     }
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        position.set(screenX, Gdx.graphics.getHeight() - screenY);
-        return super.touchDragged(screenX, screenY, pointer);
+        pos.set(screenX, Gdx.graphics.getHeight() - screenY);
+        return false;
     }
 }
