@@ -15,16 +15,13 @@ public class MenuScreen extends BaseScreen {
     private Texture lg;
     private Logo logo;
 
-    private Vector2 pos;
-
     @Override
     public void show() {
         super.show();
         bg = new Texture("textures/bg.png");
         background = new Background(bg);
         lg = new Texture("badlogic.jpg");
-        pos = new Vector2();
-        logo = new Logo(lg, pos);
+        logo = new Logo(lg);
     }
 
     @Override
@@ -36,10 +33,8 @@ public class MenuScreen extends BaseScreen {
     @Override
     public void render(float delta) {
         super.render(delta);
-        batch.begin();
-        background.draw(batch);
-        logo.draw(batch);
-        batch.end();
+        update(delta);
+        draw();
     }
 
     @Override
@@ -51,6 +46,18 @@ public class MenuScreen extends BaseScreen {
 
     @Override
     public boolean touchDown(Vector2 touch, int pointer, int button) {
-        return super.touchDown(touch, pointer, button);
+        logo.touchDown(touch, pointer, button);
+        return false;
+    }
+
+    private void update(float delta) {
+        logo.update(delta);
+    }
+
+    private void draw() {
+        batch.begin();
+        background.draw(batch);
+        logo.draw(batch);
+        batch.end();
     }
 }
