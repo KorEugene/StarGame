@@ -41,10 +41,4 @@ public class Logo extends Sprite {
         v.set(touch.cpy().sub(pos)).setLength(V_LEN);
         return false;
     }
-
-    @Override
-    public boolean touchDragged(Vector2 touch, int pointer, int button) {
-        pos.set(touch.x, Gdx.graphics.getHeight() - touch.y);
-        return false;
-    }
 }
