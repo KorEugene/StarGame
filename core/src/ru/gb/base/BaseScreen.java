@@ -86,6 +86,7 @@ public class BaseScreen implements Screen, InputProcessor {
     @Override
     public void dispose() {
         System.out.println("dispose");
+        music.dispose();
         batch.dispose();
     }
 
