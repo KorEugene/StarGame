@@ -5,6 +5,9 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import ru.gb.base.Sprite;
 import ru.gb.math.Rect;
 import ru.gb.pool.BulletPool;
@@ -32,6 +35,8 @@ public class MainShip extends Sprite {
     private float bulletHeight;
     private int bulletDamage;
 
+    private int count;
+
     public MainShip(TextureAtlas atlas, BulletPool bulletPool) {
         super(atlas.findRegion("main_ship"), 1, 2, 2);
         this.bulletPool = bulletPool;
@@ -40,11 +45,13 @@ public class MainShip extends Sprite {
         bulletV = new Vector2(0, 0.5f);
         bulletHeight = 0.01f;
         bulletDamage = 1;
+        count = 0;
     }
 
     @Override
     public void update(float delta) {
         super.update(delta);
+        count++;
         pos.mulAdd(v, delta);
         if (getRight() > worldBounds.getRight()) {
             setRight(worldBounds.getRight());
@@ -53,6 +60,9 @@ public class MainShip extends Sprite {
         if (getLeft() < worldBounds.getLeft()) {
             setLeft(worldBounds.getLeft());
             stop();
+        }
+        if (count % 30 == 0) {
+            shoot();
         }
     }
 
