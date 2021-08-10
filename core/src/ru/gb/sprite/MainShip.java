@@ -1,12 +1,11 @@
 package ru.gb.sprite;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 import ru.gb.base.Sprite;
 import ru.gb.math.Rect;
@@ -36,6 +35,7 @@ public class MainShip extends Sprite {
     private int bulletDamage;
 
     private int count;
+    private Sound sound;
 
     public MainShip(TextureAtlas atlas, BulletPool bulletPool) {
         super(atlas.findRegion("main_ship"), 1, 2, 2);
@@ -46,6 +46,7 @@ public class MainShip extends Sprite {
         bulletHeight = 0.01f;
         bulletDamage = 1;
         count = 0;
+        sound = Gdx.audio.newSound(Gdx.files.internal("sounds/bullet.wav"));
     }
 
     @Override
@@ -171,5 +172,6 @@ public class MainShip extends Sprite {
         Bullet bullet = bulletPool.obtain();
         bulletPos.set(pos.x, pos.y + getHalfHeight());
         bullet.set(this, bulletRegion, bulletPos, bulletV, bulletHeight, worldBounds, bulletDamage);
+        sound.play(1.0f);
     }
 }
