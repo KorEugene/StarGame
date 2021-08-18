@@ -6,19 +6,18 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
+import ru.gb.base.Ship;
 import ru.gb.base.Sprite;
 import ru.gb.math.Rect;
 import ru.gb.pool.BulletPool;
+import ru.gb.pool.ExplosionPool;
 
-public class MainShip extends Sprite {
+public class MainShip extends Ship {
 
     private static final float HEIGHT = 0.15f;
     private static final float BOTTOM_MARGIN = 0.05f;
     private static final int INVALID_POINTER = -1;
-    private static final float RELOAD_INTERVAL = 0.3f;
-
-    private final Vector2 v0 = new Vector2(0.5f, 0);
-    private final Vector2 v = new Vector2();
+    private static final float RELOAD_INTERVAL = 0.2f;
 
     private boolean pressedLeft;
     private boolean pressedRight;
@@ -26,39 +25,23 @@ public class MainShip extends Sprite {
     private int leftPointer = INVALID_POINTER;
     private int rightPointer = INVALID_POINTER;
 
-    private Rect worldBounds;
-    private BulletPool bulletPool;
-    private TextureRegion bulletRegion;
-    private Vector2 bulletPos;
-    private Vector2 bulletV;
-    private float bulletHeight;
-    private int bulletDamage;
-    private Sound bulletSound;
-
-    private float reloadInterval;
-    private float reloadTimer;
-
-    public MainShip(TextureAtlas atlas, BulletPool bulletPool, Sound bulletSound) {
+    public MainShip(TextureAtlas atlas, BulletPool bulletPool, ExplosionPool explosionPool, Sound bulletSound) {
         super(atlas.findRegion("main_ship"), 1, 2, 2);
         this.bulletPool = bulletPool;
+        this.explosionPool = explosionPool;
         this.bulletSound = bulletSound;
         bulletRegion = atlas.findRegion("bulletMainShip");
-        bulletPos = new Vector2();
-        bulletV = new Vector2(0, 0.5f);
+        bulletV.set(0, 0.5f);
         bulletHeight = 0.01f;
         bulletDamage = 1;
         reloadInterval = RELOAD_INTERVAL;
+        v0.set(0.5f, 0);
+        hp = 1;
     }
 
     @Override
     public void update(float delta) {
         super.update(delta);
-        pos.mulAdd(v, delta);
-        reloadTimer += delta;
-        if (reloadTimer >= reloadInterval) {
-            reloadTimer = 0f;
-            shoot();
-        }
         if (getRight() > worldBounds.getRight()) {
             setRight(worldBounds.getRight());
             stop();
@@ -67,13 +50,7 @@ public class MainShip extends Sprite {
             setLeft(worldBounds.getLeft());
             stop();
         }
-
-//        if (getLeft() > worldBounds.getRight()) {
-//            setRight(worldBounds.getLeft());
-//        }
-//        if (getRight() < worldBounds.getLeft()) {
-//            setLeft(worldBounds.getRight());
-//        }
+        bulletPos.set(pos.x, pos.y + getHalfHeight());
     }
 
     @Override
@@ -162,6 +139,16 @@ public class MainShip extends Sprite {
         return false;
     }
 
+    @Override
+    public boolean isBulletCollision(Bullet bullet) {
+        return !(
+                bullet.getRight() < getLeft()
+                        || bullet.getLeft() > getRight()
+                        || bullet.getBottom() > pos.y
+                        || bullet.getTop() < getBottom()
+        );
+    }
+
     private void moveRight() {
         v.set(v0);
     }
@@ -174,10 +161,4 @@ public class MainShip extends Sprite {
         v.setZero();
     }
 
-    private void shoot() {
-        Bullet bullet = bulletPool.obtain();
-        bulletPos.set(pos.x, pos.y + getHalfHeight());
-        bullet.set(this, bulletRegion, bulletPos, bulletV, bulletHeight, worldBounds, bulletDamage);
-        bulletSound.play(0.5f);
-    }
 }
